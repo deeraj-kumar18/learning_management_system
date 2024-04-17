@@ -1,6 +1,7 @@
 # db.py
 import psycopg2
 import logging
+from werkzeug.security import check_password_hash
 
 class Database:
     def __init__(self, host, database, user, password):
@@ -46,6 +47,22 @@ class Database:
         except Exception as e:
             self.logger.error(f"Error executing query: {e}")
             conn.rollback()
+            raise
+        finally:
+            self.close(conn)
+
+    def authenticate_user(self, username, password):
+        conn = self.connect()
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cur.fetchone()
+            if user and check_password_hash(user[2], password):  # Assuming password is hashed
+                return user
+            else:
+                return None
+        except Exception as e:
+            self.logger.error(f"Error authenticating user: {e}")
             raise
         finally:
             self.close(conn)
