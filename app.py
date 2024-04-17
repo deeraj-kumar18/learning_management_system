@@ -7,12 +7,22 @@ from db import Database  # Import the Database class from db.py module
 app = Flask(__name__)
 app.secret_key = '9fce27c5bd0b2ba35607b8dafafed0021875a46ef656c7ea'
 
+# Database credentials
+DB_HOST = 'localhost'
+DB_NAME = 'lms'
+DB_USER = 'postgres'
+DB_PASSWORD = 'dheerajpostgres'
+
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Database instance
-db = Database()
+db = Database(DB_HOST, DB_NAME, DB_USER, DB_PASSWORD)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 # Route for login page
 @app.route('/login', methods=['GET', 'POST'])
